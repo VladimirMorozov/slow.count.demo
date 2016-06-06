@@ -49,10 +49,11 @@ public class Demo {
         final MapStoreConfig mapStoreConfig = new MapStoreConfig();
         mapStoreConfig.setFactoryImplementation((MapStoreFactory<Long, MyEntity>) (mapName, properties) -> loader);
         mapConfig.setMapStoreConfig(mapStoreConfig);
-        mapConfig.setInMemoryFormat(InMemoryFormat.BINARY);
+        mapConfig.setInMemoryFormat(InMemoryFormat.OBJECT);
 
         HazelcastInstance hazelcastInstance = Hazelcast.newHazelcastInstance(config);
         IMap<String, MyEntity> map = hazelcastInstance.getMap( "default" );
+        map.loadAll(true);
 
         Predicate predicate = Predicates.equal("filterField", "two");
         long start = System.currentTimeMillis();
@@ -67,7 +68,7 @@ public class Demo {
         start = System.currentTimeMillis();
         map.values( pagingPredicate );
         pagingPredicate.nextPage();
-        System.out.println("paging time: " + (System.currentTimeMillis() - start) + " result: " + count);
+        System.out.println("paging time: " + (System.currentTimeMillis() - start));
     }
 
     static class MyComparator implements Comparator<Map.Entry> {
